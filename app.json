@@ -1,0 +1,46 @@
+{
+    "name": "Streamsb Uploader Bot",
+    "description": "A Telegram Bot That can upload any file to streamsb written by ngapyi",
+    "keywords": [
+        "telegram",
+        "streamsb",
+        "upload",
+        "manager",
+        "bot"
+    ],
+    "repository": "https://github.com/PyiHeinTun/Cloud-UPManager-Bot",
+    "website": "https://telegram.dog/AbirHasan2005",
+    "success_url": "https://t.me/Discovery_Updates",
+    "env": {
+        "API_ID": {
+            "description": "Get this value from my.telegram.org or @TeleORG_Bot"
+        },
+        "API_HASH": {
+            "description": "Get this value from my.telegram.org or @TeleORG_Bot"
+        },
+        "BOT_TOKEN": {
+            "description": "Get this from @BotFather XD"
+        },
+        "STREAMSB_API": {
+            "description": "StreamsbAPI key. Get this from https://streamsb.com/"
+        },
+        "BOT_OWNER": {
+            "description": "Bot Owner UserID",
+            "required": false
+        },
+        "LOG_CHANNEL": {
+            "description": "Logs Channel ID for some Tracking XD. Example: -100123456789"
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    }
+}
