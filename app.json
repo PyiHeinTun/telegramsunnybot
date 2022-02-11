@@ -30,6 +30,9 @@
         },
         "LOG_CHANNEL": {
             "description": "Logs Channel ID for some Tracking XD. Example: -100123456789"
+        },
+        "FEMBED_API" : {
+            "description" : "GET FROM FEMBED" 
         }
     },
     "buildpacks": [
