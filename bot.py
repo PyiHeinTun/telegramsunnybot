@@ -113,7 +113,7 @@ async def button(bot, data: CallbackQuery):
                 parsed_html = BeautifulSoup(html, features="html.parser")
                 id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
-                   f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`",
+                   f"**File Name:** `{filename}`\n\n**Server 1 Video Link  :**   `{id}`",
                    parse_mode="Markdown",
                    disable_web_page_preview=True,
                    )
@@ -180,7 +180,7 @@ async def button(bot, data: CallbackQuery):
                     await b.delete(True)
                     await c.delete(True)
                     await data.message.reply_to_message.reply_text(
-                    f"**File Name:**  `{filename}` \n\n**Video ID:** `{rawJson['data']}`",
+                    f"**File Name:**  `{filename}` \n\n**Server 2 Video Link  :** ` {rawJson['data']}`",
                     parse_mode="Markdown",
                     disable_web_page_preview=True,
                     )
