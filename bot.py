@@ -81,12 +81,13 @@ async def button(bot, data: CallbackQuery):
             file_name=dl_loc,
             progress=progress_for_pyrogram,
             progress_args=(
-                "Download kortasi ...",
+                "Downloading Video ...",
                 a,
                 c_time
             )
         )
-        await a.delete(True)
+        b = await data.message.edit("Uploading to my Server ...", parse_mode="Markdown",
+                                    disable_web_page_preview=True)
         async with aiohttp.ClientSession() as session:
             Main_API = "https://api.streamsb.com/api/upload/server?key={key}"
             hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API))
@@ -106,7 +107,8 @@ async def button(bot, data: CallbackQuery):
                     disable_web_page_preview=True)
                 return
             else:
-      
+                await a.delete(True)
+                await b.delete(True)
                 html = str(await response.text())
                 parsed_html = BeautifulSoup(html, features="html.parser")
                 id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
@@ -133,12 +135,14 @@ async def button(bot, data: CallbackQuery):
             file_name=dl_loc,
             progress=progress_for_pyrogram,
             progress_args=(
-                "Download kortasi ...",
+                "Downloading Video ...",
                 a,
                 c_time
             )
         )
-        await a.delete(True)
+        b = await data.message.edit("Uploading to my Server ...", parse_mode="Markdown",
+                                    disable_web_page_preview=True)
+    
         async with aiohttp.ClientSession() as session:
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
             uploadUrl = await session.post('https://www.fembed.com/api/upload',data=uploadData)
@@ -155,24 +159,32 @@ async def button(bot, data: CallbackQuery):
             # Upload a file to a tus server.
             with open(the_media, "rb") as f:
                 location = await aiotus.upload(creation_url, f, metadata)
-                
-            id_temp_url = 'https://www.fembed.com/api/fingerprint'
-            file_fingerprint = str(location).split('upload/')[1]
-            files = {'client_id': '383227','client_secret': Config.FEMBED_API , 'file_fingerprint': file_fingerprint}
-            response = await session.post(id_temp_url, data=files)
-            print(file_fingerprint)
-            rawJson = await response.json()
-            try:
-                os.remove(the_media)
-            except:
-                pass
-
-            
-            await data.message.reply_to_message.reply_text(
-               f"**File Name:**  `{filename}` \n\n**Video ID:** `{rawJson['data']}`",
-               parse_mode="Markdown",
-               disable_web_page_preview=True,
-               )
+            c = await data.message.edit("Encoding Video Please Wait.....", parse_mode="Markdown",
+                                    disable_web_page_preview=True)
+            while True:
+                id_temp_url = 'https://www.fembed.com/api/fingerprint'
+                file_fingerprint = str(location).split('upload/')[1]
+                files = {'client_id': '383227','client_secret': Config.FEMBED_API , 'file_fingerprint': file_fingerprint}
+                response = await session.post(id_temp_url, data=files)
+                print(file_fingerprint)
+                rawJson = await response.json()
+                print(rawJson['data'])
+                if(rawJson['data'] == "Fingerprint not found"):
+                    time.sleep(60)
+                else:
+                    try:
+                        os.remove(the_media)
+                    except:
+                        pass
+                    await a.delete(True)
+                    await b.delete(True)
+                    await c.delete(True)
+                    await data.message.reply_to_message.reply_text(
+                    f"**File Name:**  `{filename}` \n\n**Video ID:** `{rawJson['data']}`",
+                    parse_mode="Markdown",
+                    disable_web_page_preview=True,
+                    )
+                    break
 
     elif "showcreds" in cb_data:
         if int(data.from_user.id) == Config.BOT_OWNER:
