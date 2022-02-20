@@ -51,8 +51,8 @@ async def _main(_, message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                 InlineKeyboardButton("Upload to Server 1", callback_data="uptostreamtape"),
-                 InlineKeyboardButton("Upload to Server 2", callback_data="uptofembed"),
+                #  InlineKeyboardButton("Upload to Server 1", callback_data="uptostreamtape"),
+                #  InlineKeyboardButton("Upload to Server 2", callback_data="uptofembed"),
                  InlineKeyboardButton("Upload to Both", callback_data="uptoboth")
                 ]
             ]
