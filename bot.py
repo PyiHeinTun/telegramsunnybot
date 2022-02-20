@@ -97,6 +97,7 @@ async def button(bot, data: CallbackQuery):
             files = {'file': open(the_media, 'rb'),'api_key': Config.STREAMSB_API}
             response = await session.post(temp_api, data=files)
             filename = the_media.split("/")[-1].replace("_", " ")
+            html = await response.text()
             try:
                 os.remove(the_media)
             except:
@@ -110,7 +111,6 @@ async def button(bot, data: CallbackQuery):
             else:
                 await a.delete(True)
                 await b.delete(True)
-                html = str(await response.text())
                 parsed_html = BeautifulSoup(html, features="html.parser")
                 id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
@@ -212,7 +212,7 @@ async def button(bot, data: CallbackQuery):
             files = {'file': open(the_media, 'rb'),'api_key': Config.STREAMSB_API}
             response = await session.post(temp_api, data=files)
             filename = the_media.split("/")[-1].replace("_", " ")
-            
+            html = await response.text()
             if not int(response.status) == 200:
                 await data.message.reply_to_message.reply_text(
                     "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", parse_mode="Markdown",
@@ -254,12 +254,10 @@ async def button(bot, data: CallbackQuery):
                         pass
                     await a.delete(True)
                     await b.delete(True)
-                    html = str(await response.text())
+                    await c.delete(True)
                     parsed_html = BeautifulSoup(html, features="html.parser")
                     id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
-                    await a.delete(True)
-                    await b.delete(True)
-                    await c.delete(True)
+
                     await data.message.reply_to_message.reply_text(
                     f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2** `{rawJson['data']}`",
                     parse_mode="Markdown",
