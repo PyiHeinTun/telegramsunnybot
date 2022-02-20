@@ -4,7 +4,6 @@ import asyncio
 import aiohttp
 import aiotus
 
-
 from configs import Config
 from pyrogram import Client, filters, errors
 try: 
@@ -16,7 +15,6 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
     InputTextMessageContent, InlineQuery 
 
 Bot = Client(Config.SESSION_NAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
-
 
 @Bot.on_message(filters.command("start"))
 async def start_handler(_, cmd):
@@ -95,9 +93,10 @@ async def button(bot, data: CallbackQuery):
             json_data = await hit_api.json()
             temp_api = json_data["result"]
             files = {'file': open(the_media, 'rb'),'api_key': Config.STREAMSB_API}
+            
             response = await session.post(temp_api, data=files)
             filename = the_media.split("/")[-1].replace("_", " ")
-            html = await response.text()
+            print(str(response))
             try:
                 os.remove(the_media)
             except:
@@ -111,10 +110,13 @@ async def button(bot, data: CallbackQuery):
             else:
                 await a.delete(True)
                 await b.delete(True)
+                
+                html = await response.text()
                 parsed_html = BeautifulSoup(html, features="html.parser")
-                id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
+                print(parsed_html);
+                # id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
-                   f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`",
+                   f"**File Name:** `{filename}`\n\n**Download Link:** ",
                    parse_mode="Markdown",
                    disable_web_page_preview=True,
                    )
@@ -204,21 +206,6 @@ async def button(bot, data: CallbackQuery):
                                     disable_web_page_preview=True)
     
         async with aiohttp.ClientSession() as session:
-            #UPLOAD TO STREAMSB
-            Main_API = "https://api.streamsb.com/api/upload/server?key={key}"
-            hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API))
-            json_data = await hit_api.json()
-            temp_api = json_data["result"]
-            files = {'file': open(the_media, 'rb'),'api_key': Config.STREAMSB_API}
-            response = await session.post(temp_api, data=files)
-            filename = the_media.split("/")[-1].replace("_", " ")
-            html = await response.text()
-            if not int(response.status) == 200:
-                await data.message.reply_to_message.reply_text(
-                    "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", parse_mode="Markdown",
-                    disable_web_page_preview=True)
-                return
-                
             #UPLOAD TO FEMBED
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
             uploadUrl = await session.post('https://www.fembed.com/api/upload',data=uploadData)
@@ -252,18 +239,30 @@ async def button(bot, data: CallbackQuery):
                         os.remove(the_media)
                     except:
                         pass
+                    #UPLOAD TO STREAMSB
+                    url = 'https://www.fembed.com/v/'+rawJson['data']
+                    Main_API = "https://api.streamsb.com/api/upload/url?key={key}&url={url}"
+                    hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API, url= url))
+                    json_data = await hit_api.json()
+                    id = json_data["result"]["filecode"]
+
+                    if not int(hit_api.status) == 200:
+                        await data.message.reply_to_message.reply_text(
+                            "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", parse_mode="Markdown",
+                            disable_web_page_preview=True)
+                        return
+                
                     await a.delete(True)
                     await b.delete(True)
                     await c.delete(True)
-                    parsed_html = BeautifulSoup(html, features="html.parser")
-                    id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
-
                     await data.message.reply_to_message.reply_text(
                     f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2** `{rawJson['data']}`",
                     parse_mode="Markdown",
                     disable_web_page_preview=True,
                     )
                     break 
+                    
+              
 
     elif "showcreds" in cb_data:
         if int(data.from_user.id) == Config.BOT_OWNER:
