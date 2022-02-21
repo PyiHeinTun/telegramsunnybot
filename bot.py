@@ -51,8 +51,6 @@ async def _main(_, message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                #  InlineKeyboardButton("Upload to Server 1", callback_data="uptostreamtape"),
-                #  InlineKeyboardButton("Upload to Server 2", callback_data="uptofembed"),
                  InlineKeyboardButton("Upload to Both", callback_data="uptoboth")
                 ]
             ]
@@ -202,11 +200,10 @@ async def button(bot, data: CallbackQuery):
                 c_time
             )
         )
-        b = await data.message.edit("Uploading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
     
         async with aiohttp.ClientSession() as session:
             #UPLOAD TO FEMBED
+            await data.message.edit("Uploading To Servers")
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
             uploadUrl = await session.post('https://www.fembed.com/api/upload',data=uploadData)
             uploadUrlExtract = await uploadUrl.json()
@@ -222,8 +219,6 @@ async def button(bot, data: CallbackQuery):
             # Upload a file to a tus server.
             with open(the_media, "rb") as f:
                 location = await aiotus.upload(creation_url, f, metadata)
-            c = await data.message.edit("Encoding Video Please Wait.....", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
             while True:
                 id_temp_url = 'https://www.fembed.com/api/fingerprint'
                 file_fingerprint = str(location).split('upload/')[1]
@@ -253,8 +248,6 @@ async def button(bot, data: CallbackQuery):
                         return
                 
                     await a.delete(True)
-                    await b.delete(True)
-                    await c.delete(True)
                     await data.message.reply_to_message.reply_text(
                     f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2** `{rawJson['data']}`",
                     parse_mode="Markdown",
