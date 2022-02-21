@@ -203,7 +203,6 @@ async def button(bot, data: CallbackQuery):
     
         async with aiohttp.ClientSession() as session:
             #UPLOAD TO FEMBED
-            await data.message.edit("Uploading To Servers")
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
             uploadUrl = await session.post('https://www.fembed.com/api/upload',data=uploadData)
             uploadUrlExtract = await uploadUrl.json()
