@@ -51,6 +51,8 @@ async def _main(_, message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
+                 InlineKeyboardButton("Server 1", callback_data="uptostreamtape"),
+                 InlineKeyboardButton("Server 2", callback_data="uptofembed"),
                  InlineKeyboardButton("Upload to Both", callback_data="uptoboth")
                 ]
             ]
@@ -83,8 +85,6 @@ async def button(bot, data: CallbackQuery):
                 c_time
             )
         )
-        b = await data.message.edit("Uploading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
         async with aiohttp.ClientSession() as session:
             Main_API = "https://api.streamsb.com/api/upload/server?key={key}"
             hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API))
@@ -107,14 +107,12 @@ async def button(bot, data: CallbackQuery):
                 return
             else:
                 await a.delete(True)
-                await b.delete(True)
                 
                 html = await response.text()
                 parsed_html = BeautifulSoup(html, features="html.parser")
-                print(parsed_html);
-                # id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
+                id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
-                   f"**File Name:** `{filename}`\n\n**Download Link:** ",
+                   f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`",
                    parse_mode="Markdown",
                    disable_web_page_preview=True,
                    )
@@ -202,7 +200,15 @@ async def button(bot, data: CallbackQuery):
         )
     
         async with aiohttp.ClientSession() as session:
-            #UPLOAD TO FEMBED
+            #Upload to streamsb
+            Main_API = "https://api.streamsb.com/api/upload/server?key={key}"
+            hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API))
+            json_data = await hit_api.json()
+            temp_api = json_data["result"]
+            files = {'file': open(the_media, 'rb'),'api_key': Config.STREAMSB_API}
+            streamsbResponse = await session.post(temp_api, data=files)
+            
+            #Upload to fembed
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
             uploadUrl = await session.post('https://www.fembed.com/api/upload',data=uploadData)
             uploadUrlExtract = await uploadUrl.json()
@@ -215,6 +221,7 @@ async def button(bot, data: CallbackQuery):
                 "token": str(temp_token).encode(),
                 "name": str(filename).encode()
             }
+
             # Upload a file to a tus server.
             with open(the_media, "rb") as f:
                 location = await aiotus.upload(creation_url, f, metadata)
@@ -222,9 +229,8 @@ async def button(bot, data: CallbackQuery):
                 id_temp_url = 'https://www.fembed.com/api/fingerprint'
                 file_fingerprint = str(location).split('upload/')[1]
                 files = {'client_id': '383227','client_secret': Config.FEMBED_API , 'file_fingerprint': file_fingerprint}
-                fembedresponse = await session.post(id_temp_url, data=files)
-                print(file_fingerprint)
-                rawJson = await fembedresponse.json()
+                response = await session.post(id_temp_url, data=files)
+                rawJson = await response.json()
                 print(rawJson['data'])
                 if(rawJson['data'] == "Fingerprint not found"):
                     time.sleep(60)
@@ -233,28 +239,16 @@ async def button(bot, data: CallbackQuery):
                         os.remove(the_media)
                     except:
                         pass
-                    #UPLOAD TO STREAMSB
-                    url = 'https://www.fembed.com/v/'+rawJson['data']
-                    Main_API = "https://api.streamsb.com/api/upload/url?key={key}&url={url}"
-                    hit_api = await session.get(Main_API.format(key = Config.STREAMSB_API, url= url))
-                    json_data = await hit_api.json()
-                    id = json_data["result"]["filecode"]
-
-                    if not int(hit_api.status) == 200:
-                        await data.message.reply_to_message.reply_text(
-                            "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", parse_mode="Markdown",
-                            disable_web_page_preview=True)
-                        return
-                
                     await a.delete(True)
+                    html = await streamsbResponse.text()
+                    parsed_html = BeautifulSoup(html, features="html.parser")
+                    id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                     await data.message.reply_to_message.reply_text(
-                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2** `{rawJson['data']}`",
+                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{rawJson['data']}` \n\n**Server 2:** `{id}`",
                     parse_mode="Markdown",
                     disable_web_page_preview=True,
                     )
-                    break 
-                    
-              
+                    break
 
     elif "showcreds" in cb_data:
         if int(data.from_user.id) == Config.BOT_OWNER:
