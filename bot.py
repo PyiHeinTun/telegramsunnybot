@@ -244,7 +244,7 @@ async def button(bot, data: CallbackQuery):
                     parsed_html = BeautifulSoup(html, features="html.parser")
                     id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                     await data.message.reply_to_message.reply_text(
-                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{rawJson['data']}` \n\n**Server 2:** `{id}`",
+                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2:** `{rawJson['data']}`",
                     parse_mode="Markdown",
                     disable_web_page_preview=True,
                     )
