@@ -44,8 +44,7 @@ async def help_handler(_, cmd):
 
 @Bot.on_message(filters.private & filters.media)
 async def _main(c, message):
-    asking_file_name = await c.ask(message.chat.id, '*Send me File Name:*', parse_mode='Markdown',
-                                    disable_web_page_preview=True)
+    asking_file_name = await c.ask(message.chat.id, '*Send me File Name:*')
     file_name = asking_file_name.text
     await c.delete_messages(message.chat.id, [asking_file_name['message_id'],asking_file_name['request']['message_id']])
     await message.reply_text(
