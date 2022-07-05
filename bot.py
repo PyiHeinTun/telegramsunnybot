@@ -3,7 +3,7 @@ import time
 import asyncio
 import aiohttp
 import aiotus
-
+from pyromod import listen
 from configs import Config
 from pyrogram import Client, filters, errors
 try: 
@@ -43,7 +43,11 @@ async def help_handler(_, cmd):
 
 
 @Bot.on_message(filters.private & filters.media)
-async def _main(_, message):
+async def _main(c, message):
+    asking_file_name = await c.ask(message.chat.id, '*Send me File Name:*', parse_mode='Markdown',
+                                    disable_web_page_preview=True)
+    file_name = asking_file_name.text
+    await c.delete_messages(message.chat.id, [asking_file_name['message_id'],asking_file_name['request']['message_id']])
     await message.reply_text(
         "Where you want to Upload?",
         parse_mode="Markdown",
@@ -51,9 +55,9 @@ async def _main(_, message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                 InlineKeyboardButton("Server 1", callback_data="uptostreamtape"),
-                 InlineKeyboardButton("Server 2", callback_data="uptofembed"),
-                 InlineKeyboardButton("Upload to Both", callback_data="uptoboth")
+                 InlineKeyboardButton("Server 1", callback_data=f'uptostreamtape:{file_name}'),
+                 InlineKeyboardButton("Server 2", callback_data=f'uptofembed:{file_name}'),
+                 InlineKeyboardButton("Upload to Both", callback_data=f'uptoboth:{file_name}')
                 ]
             ]
         ),
@@ -65,8 +69,9 @@ async def _main(_, message):
 
 @Bot.on_callback_query()
 async def button(bot, data: CallbackQuery):
-    cb_data = data.data
-
+    cb_data = data.data.split(':')[0]
+    userfileName = data.data.split(':')[1]
+    
     if "uptostreamtape" in cb_data:
         downloadit = data.message.reply_to_message
         a = await data.message.edit("Downloading to my Server ...", parse_mode="Markdown",
@@ -74,10 +79,11 @@ async def button(bot, data: CallbackQuery):
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
+        dl_loc_name = dl_loc + userfileName + '.mp4'
         c_time = time.time()
         the_media = await bot.download_media(
             message=downloadit,
-            file_name=dl_loc,
+            file_name=dl_loc_name,
             progress=progress_for_pyrogram,
             progress_args=(
                 "Downloading Video ...",
@@ -94,7 +100,6 @@ async def button(bot, data: CallbackQuery):
             
             response = await session.post(temp_api, data=files)
             filename = the_media.split("/")[-1].replace("_", " ")
-            print(str(response))
             try:
                 os.remove(the_media)
             except:
@@ -123,10 +128,11 @@ async def button(bot, data: CallbackQuery):
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
+        dl_loc_name = dl_loc + userfileName + '.mp4'
         c_time = time.time()
         the_media = await bot.download_media(
             message=downloadit,
-            file_name=dl_loc,
+            file_name=dl_loc_name,
             progress=progress_for_pyrogram,
             progress_args=(
                 "Downloading Video ...",
@@ -160,9 +166,9 @@ async def button(bot, data: CallbackQuery):
                 file_fingerprint = str(location).split('upload/')[1]
                 files = {'client_id': '383227','client_secret': Config.FEMBED_API , 'file_fingerprint': file_fingerprint}
                 response = await session.post(id_temp_url, data=files)
-                print(file_fingerprint)
+            
                 rawJson = await response.json()
-                print(rawJson['data'])
+
                 if(rawJson['data'] == "Fingerprint not found"):
                     time.sleep(60)
                 else:
@@ -187,10 +193,11 @@ async def button(bot, data: CallbackQuery):
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
+        dl_loc_name = dl_loc + userfileName + '.mp4'
         c_time = time.time()
         the_media = await bot.download_media(
             message=downloadit,
-            file_name=dl_loc,
+            file_name=dl_loc_name,
             progress=progress_for_pyrogram,
             progress_args=(
                 "Downloading Video ...",
@@ -231,7 +238,6 @@ async def button(bot, data: CallbackQuery):
                 files = {'client_id': '383227','client_secret': Config.FEMBED_API , 'file_fingerprint': file_fingerprint}
                 response = await session.post(id_temp_url, data=files)
                 rawJson = await response.json()
-                print(rawJson['data'])
                 if(rawJson['data'] == "Fingerprint not found"):
                     time.sleep(60)
                 else:
@@ -244,7 +250,7 @@ async def button(bot, data: CallbackQuery):
                     parsed_html = BeautifulSoup(html, features="html.parser")
                     id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                     await data.message.reply_to_message.reply_text(
-                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{id}` \n\n**Server 2:** `{rawJson['data']}`",
+                    f"**File Name:**  `{filename}` \n\n**Server 1:** `{rawJson['data']}` \n\n**Server 2:** `{id}`",
                     parse_mode="Markdown",
                     disable_web_page_preview=True,
                     )
