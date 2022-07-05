@@ -31,8 +31,6 @@ async def start_handler(_, cmd):
 async def help_handler(_, cmd):
     await cmd.reply_text(
         Config.HELP_TEXT,
-        parse_mode="Markdown",
-        disable_web_page_preview=True,
         reply_markup=InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("Developer", url="https://t.me/developerngapyi")],
@@ -46,12 +44,9 @@ async def help_handler(_, cmd):
 async def _main(c, message):
     asking_file_name = await c.ask(message.chat.id, '*Send me File Name:*')
     file_name = asking_file_name.text
-    print(asking_file_name)
-    # await c.delete_messages(message.chat.id, [asking_file_name['message_id'],asking_file_name['request']['message_id']])
+    await c.delete_messages(message.chat.id, [asking_file_name['id'],asking_file_name['request']['id']])
     await message.reply_text(
         "Where you want to Upload?",
-        parse_mode="Markdown",
-        disable_web_page_preview=True,
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -74,8 +69,7 @@ async def button(bot, data: CallbackQuery):
     
     if "uptostreamtape" in cb_data:
         downloadit = data.message.reply_to_message
-        a = await data.message.edit("Downloading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
+        a = await data.message.edit("Downloading to my Server ...")
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
@@ -107,8 +101,7 @@ async def button(bot, data: CallbackQuery):
 
             if not int(response.status) == 200:
                 await data.message.reply_to_message.reply_text(
-                    "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", parse_mode="Markdown",
-                    disable_web_page_preview=True)
+                    "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", 
                 return
             else:
                 await a.delete(True)
@@ -118,13 +111,11 @@ async def button(bot, data: CallbackQuery):
                 id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
                    f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`",
-                   parse_mode="Markdown",
-                   disable_web_page_preview=True,
+                 
                    )
     elif "uptofembed" in cb_data:
         downloadit = data.message.reply_to_message
-        a = await data.message.edit("Downloading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
+        a = await data.message.edit("Downloading to my Server ...")
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
@@ -140,8 +131,7 @@ async def button(bot, data: CallbackQuery):
                 c_time
             )
         )
-        b = await data.message.edit("Uploading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
+        b = await data.message.edit("Uploading to my Server ...")
     
         async with aiohttp.ClientSession() as session:
             uploadData = {'client_id':'383227', 'client_secret': Config.FEMBED_API}
@@ -159,8 +149,7 @@ async def button(bot, data: CallbackQuery):
             # Upload a file to a tus server.
             with open(the_media, "rb") as f:
                 location = await aiotus.upload(creation_url, f, metadata)
-            c = await data.message.edit("Encoding Video Please Wait.....", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
+            c = await data.message.edit("Encoding Video Please Wait.....")
             while True:
                 id_temp_url = 'https://www.fembed.com/api/fingerprint'
                 file_fingerprint = str(location).split('upload/')[1]
@@ -180,16 +169,13 @@ async def button(bot, data: CallbackQuery):
                     await b.delete(True)
                     await c.delete(True)
                     await data.message.reply_to_message.reply_text(
-                    f"**File Name:**  `{filename}` \n\n**Video ID:** `{rawJson['data']}`",
-                    parse_mode="Markdown",
-                    disable_web_page_preview=True,
+                    f"**File Name:**  `{filename}` \n\n**Video ID:** `{rawJson['data']}`"
                     )
                     break
                     
     elif "uptoboth" in cb_data:
         downloadit = data.message.reply_to_message
-        a = await data.message.edit("Downloading to my Server ...", parse_mode="Markdown",
-                                    disable_web_page_preview=True)
+        a = await data.message.edit("Downloading to my Server ...")
         dl_loc = Config.DOWNLOAD_DIR + "/" + str(data.from_user.id) + "/"
         if not os.path.isdir(dl_loc):
             os.makedirs(dl_loc)
@@ -251,8 +237,6 @@ async def button(bot, data: CallbackQuery):
                     id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                     await data.message.reply_to_message.reply_text(
                     f"**File Name:**  `{filename}` \n\n**Server 1:** `{rawJson['data']}` \n\n**Server 2:** `{id}`",
-                    parse_mode="Markdown",
-                    disable_web_page_preview=True,
                     )
                     break
 
@@ -260,7 +244,7 @@ async def button(bot, data: CallbackQuery):
         if int(data.from_user.id) == Config.BOT_OWNER:
             await data.message.edit(
                 f"Here are your Configs:\n\n`API_ID` - `{str(Config.API_ID)}`\n`API_HASH` - `{Config.API_HASH}`\n`BOT_TOKEN` - `{Config.BOT_TOKEN}`",
-                parse_mode="Markdown", disable_web_page_preview=True)
+                )
         else:
             await data.message.edit("Only My Admin Can View That!")
 
