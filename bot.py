@@ -101,17 +101,15 @@ async def button(bot, data: CallbackQuery):
 
             if not int(response.status) == 200:
                 await data.message.reply_to_message.reply_text(
-                    "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!", 
+                    "Something Went Wrong!\n\n**Error:** Server Didn't Accept My Request!") 
                 return
             else:
                 await a.delete(True)
-                
                 html = await response.text()
                 parsed_html = BeautifulSoup(html, features="html.parser")
                 id = parsed_html.body.find('textarea', attrs={'name':'fn'}).text
                 await data.message.reply_to_message.reply_text(
-                   f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`",
-                 
+                   f"**File Name:** `{filename}`\n\n**Download Link:** `{id}`"
                    )
     elif "uptofembed" in cb_data:
         downloadit = data.message.reply_to_message
