@@ -160,7 +160,7 @@ async def button(bot, data: CallbackQuery):
                     time.sleep(60)
                 else:
                     try:
-                        os.remove(the_media)
+                        await os.remove(the_media)
                     except:
                         pass
                     await a.delete(True)
@@ -226,7 +226,7 @@ async def button(bot, data: CallbackQuery):
                     time.sleep(60)
                 else:
                     try:
-                        os.remove(the_media)
+                       await os.remove(the_media)
                     except:
                         pass
                     await a.delete(True)

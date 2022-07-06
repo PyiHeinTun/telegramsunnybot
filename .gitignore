@@ -2,3 +2,4 @@ config.env
 .env
 msub1.env
 test.env
+CloudManagerBot.session
