@@ -2,16 +2,15 @@
 
 import os
 
-class Config(object):
-	API_ID = os.environ.get("API_ID")
-	API_ID = os.environ.get("API_ID")
-	API_HASH = os.environ.get("API_HASH")
-	BOT_TOKEN = os.environ.get("BOT_TOKEN")
-	STREAMSB_API = os.environ.get("STREAMSB_API")
-	FEMBED_API = os.environ.get("FEMBED_API")
+class Config:
+	API_ID = os.environ.get("API_ID",11218167)
+	API_HASH = os.environ.get("API_HASH",'4c247595b275abf492797ae29d859f13')
+	BOT_TOKEN = os.environ.get("BOT_TOKEN",'5234079171:AAH57GS88pIzgSJKerDOii6OGr9AhAzCUHo')
+	STREAMSB_API = os.environ.get("STREAMSB_API",'30931ba9i8vjyv71e0104')
+	FEMBED_API = os.environ.get("FEMBED_API",'47778f19b0ee0e2e')
 	SESSION_NAME = os.environ.get("SESSION_NAME", "CloudManagerBot")
-	BOT_OWNER = os.environ.get("BOT_OWNER")
-	LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
+	BOT_OWNER = os.environ.get("BOT_OWNER",2146800175)
+	LOG_CHANNEL = os.environ.get("LOG_CHANNEL",'-1001750914901')
 	DOWNLOAD_DIR = os.environ.get("DOWNLOAD_DIR", "./downloads")
 	HELP_TEXT = """
 Send me any Media & Choose Upload Server,
