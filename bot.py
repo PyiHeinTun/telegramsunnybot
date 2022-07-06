@@ -95,7 +95,7 @@ async def button(bot, data: CallbackQuery):
             response = await session.post(temp_api, data=files)
             filename = the_media.split("/")[-1].replace("_", " ")
             try:
-                os.remove(the_media)
+                await os.remove(the_media)
             except:
                 pass
 
