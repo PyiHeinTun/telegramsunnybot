@@ -42,7 +42,8 @@ async def help_handler(_, cmd):
 
 @Bot.on_message(filters.private & filters.media)
 async def _main(c, message):
-    asking_file_name = await c.ask(message.chat.id, '*Send me File Name:*')
+    print(message.caption)
+    asking_file_name = await c.ask(message.chat.id, f'*Send me File Name For : {message.caption}*')
     file_name = asking_file_name.text
     await c.delete_messages(message.chat.id, [asking_file_name.id,asking_file_name.request.id])
     await message.reply_text(
